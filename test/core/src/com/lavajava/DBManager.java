@@ -52,35 +52,44 @@ public class DBManager
 
     boolean login()
     {
-
-        User user = new User();
-        user.username = "fred";
-        user.password = "pass123";
-
-        String json_str = gson.toJson(user);
-        MediaType JSON = MediaType.parse("application/json; chatset=utf-8");
-//        RequestBody req_body = RequestBody.create(json_str, JSON);
-
-        RequestBody req_body = RequestBody.create(JSON, json_str);
-        Request req = new Request.Builder()
-                .url(String.format("http://%s:%d/login/", this,ip, this.port))
-                .post(req_body)
-                .build();
-
-        try
-        {
-            Response res = http_client.newCall(req).execute();
-
-            if(res.isSuccessful())
-            {
-                Gdx.app.log("DBManager", res.body().string());
-            }
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-
+//        User user = new User();
+//        user.username = "fred";
+//        user.password = "pass123";
+//
+//        String url = String.format("http://%s:%d/login/", this.ip, this.port);
+//
+//        String json_str = gson.toJson(user);
+//        MediaType JSON = MediaType.parse("application/json; chatset=utf-8");
+//
+//        RequestBody req_body = RequestBody.create(JSON, json_str);
+//        Request req = new Request.Builder()
+//                .url("http://www.example.com")
+////                .post(req_body)
+//                .get()
+//                .build();
+//
+//        Gdx.app.log("DBManager", "Making request to" + url);
+//
+//        try
+//        {
+//            Response res = http_client.newCall(req).execute();
+//
+//            if(res.isSuccessful())
+//            {
+//                Gdx.app.log("DBManager", res.body().string());
+//            }
+//            else
+//            {
+//                Gdx.app.log("DBManager", "Shit failed yo");
+//            }
+//        }
+//        catch(IOException e)
+//        {
+//            e.printStackTrace();
+//            Gdx.app.log("DBManager", "Shit failed bigly yo");
+//
+//        }
+//
         return true;
     }
 
