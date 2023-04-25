@@ -12,12 +12,16 @@ public class AndroidLauncher extends AndroidApplication {
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+
+		// use antialiasing
+		config.numSamples = 2;
+
 		initialize(new LJGame(), config);
 
-		DBManager db = DBManager.getInstance();
+//		DBManager db = DBManager.getInstance();
 
-		db.configure("192.168.50.122", 3000);
+//		db.configure("192.168.50.122", 3000);
 
-		db.login();
+//		db.login();
 	}
 }

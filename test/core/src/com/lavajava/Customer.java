@@ -15,7 +15,7 @@ public class Customer{
     int patience;
     Drink request;
 
-    public evalDrink(Drink d){
-        
-    }
+//    public evalDrink(Drink d){
+//
+//    }
 }
