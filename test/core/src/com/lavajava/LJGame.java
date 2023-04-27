@@ -21,6 +21,7 @@ public class LJGame extends Game
 
 		// will enable us to draw text to screen
 		font = new BitmapFont();
+		font.getData().setScale(7, 7);
 
 		// init game to main menu screen
 		this.setScreen(new MainMenuScreen(this));
