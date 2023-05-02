@@ -8,7 +8,20 @@ public class Drink
 
     double cost;
 
-    public Drink() {}
+//    public Drink()
+//    {
+//        // default drink will be a vanilla late with cow's milk
+//        this.base  = Base.Caffeine;
+//        this.milk = Milk.Cow;
+//        this.syrup = Syrup.Vanilla;
+//    }
+
+    public Drink(Drink d)
+    {
+        this.base = d.base;
+        this.milk = d.milk;
+        this.syrup = d.syrup;
+    }
 
     public Drink(Base base, Milk milk, Syrup syrup)
     {

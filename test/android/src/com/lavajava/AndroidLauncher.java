@@ -1,6 +1,7 @@
 package com.lavajava;
 
 import android.os.Bundle;
+import android.view.WindowManager;
 
 import com.lavajava.DBManager;
 
@@ -15,6 +16,9 @@ public class AndroidLauncher extends AndroidApplication {
 
 		// use antialiasing
 		config.numSamples = 2;
+
+		// keep screen on
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		initialize(new LJGame(), config);
 

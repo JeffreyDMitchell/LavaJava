@@ -147,7 +147,11 @@ public class MainMenuScreen implements Screen
         // start game
         if(Gdx.input.isTouched())
         {
-            game.setScreen(new GameScreen(game));
+            if(time_stamp * ANIM_SPD < LJGame.RES_Y)
+                time_stamp = LJGame.RES_Y / ANIM_SPD;
+
+            if(time_stamp * ANIM_SPD > LJGame.RES_Y + 60)
+                game.setScreen(new GameScreen(game));
         }
 
         // sliding animation finished, start spawning cats into crowd

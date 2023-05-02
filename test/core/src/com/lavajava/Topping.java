@@ -1,7 +1,14 @@
 package com.lavajava;
+import java.util.ArrayList;
 
 public class Topping extends Drink
 {
+    static ArrayList<Class<? extends Drink>> topping_list = new ArrayList<Class<? extends Drink>>(){{
+        add(Chocolate.class);
+        add(Marshmallow.class);
+        add(Whip.class);
+    }};
+
     Drink root;
     Drink next;
 
@@ -9,6 +16,7 @@ public class Topping extends Drink
 
     public Topping(Drink d)
     {
+        super(d);
         root = d.getRoot();
         next = d;
     }
