@@ -16,6 +16,8 @@ import javax.xml.crypto.AlgorithmMethod;
 
 public class MainMenuScreen implements Screen
 {
+    public static MainMenuScreen instance;
+
     final LJGame game;
     OrthographicCamera cam;
 
@@ -28,7 +30,7 @@ public class MainMenuScreen implements Screen
     private int cat_texture_width, cat_texture_height;
 
     Array<Cat> cat_crowd;
-    public MainMenuScreen(final LJGame game)
+    private MainMenuScreen(final LJGame game)
     {
         this.game = game;
 
@@ -54,6 +56,16 @@ public class MainMenuScreen implements Screen
         bird_music = Gdx.audio.newMusic(Gdx.files.internal("Bird_Sounds.mp3"));
         bird_music.setLooping(true);
         bird_music.play();
+
+        time_stamp = 0;
+    }
+
+    public static MainMenuScreen getInstance(LJGame game)
+    {
+        if(instance == null)
+            instance = new MainMenuScreen(game);
+
+        return instance;
     }
 
     @Override
@@ -128,8 +140,6 @@ public class MainMenuScreen implements Screen
     public void hide()
     {
         bird_music.pause();
-
-        dispose();
     }
 
     @Override
@@ -151,13 +161,16 @@ public class MainMenuScreen implements Screen
                 time_stamp = LJGame.RES_Y / ANIM_SPD;
 
             if(time_stamp * ANIM_SPD > LJGame.RES_Y + 60)
+            {
+//                time_stamp = 0;
                 game.setScreen(new GameScreen(game));
+            }
         }
 
         // sliding animation finished, start spawning cats into crowd
         // attempt to spawn a cat twice a second
         // only allow 50 cats
-        if(time_stamp * ANIM_SPD > LJGame.RES_Y && time_stamp % 30 == 0 && cat_crowd.size < 50)
+        if(time_stamp * ANIM_SPD > LJGame.RES_Y && time_stamp % 120 == 0 && cat_crowd.size < 10)
         {
             // 30% chance
             if(MathUtils.random() < .3)
@@ -167,7 +180,7 @@ public class MainMenuScreen implements Screen
                 cat_crowd.add(new Cat(
                         dir ? (0 - Cat.WIDTH) : (LJGame.RES_X),
                         MathUtils.random(175),
-                        MathUtils.random(0.5f, 1.0f) * (dir ? 1 : -1),
+                        MathUtils.random(0.5f, 2.0f) * (dir ? 1 : -1),
                         cat_textures[MathUtils.random(cat_textures.length-1)]
                 ));
 

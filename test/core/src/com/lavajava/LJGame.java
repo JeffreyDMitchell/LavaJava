@@ -24,7 +24,7 @@ public class LJGame extends Game
 		font.getData().setScale(7, 7);
 
 		// init game to main menu screen
-		this.setScreen(new MainMenuScreen(this));
+		this.setScreen(MainMenuScreen.getInstance(this));
 	}
 
 	@Override

@@ -2,7 +2,11 @@ package com.lavajava;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -27,8 +31,13 @@ public class GameScreen implements Screen
 
     private OrthographicCamera cam;
 
-    private Texture background, chocolate_texture, marshmallow_texture, whip_texture;
+    private GlyphLayout gl;
+
+    private Texture background, chocolate_texture, marshmallow_texture, whip_texture, register_texture;
     private Texture[] drink_textures, milk_textures, syrup_textures, customer_textures;
+
+    private Music bg_music;
+    private Sound sale_sound, fail_sound;
 
     // nasty graphical constants
     private final int DRINK_WIDTH = 300;
@@ -40,13 +49,18 @@ public class GameScreen implements Screen
     private final int TOPPING_SIZE = 100;
     private final int WIP_DRINK_X = 750;
     private final int WIP_DRINK_Y = 375;
-
     private final int CUST_X = 1950;
     private final int CUST_Y = 318;
     private final int CUST_WIDTH = 300;
     private final int CUST_HEIGHT = 400;
+    private final float CUST_RESPAWN = 1;
+//    private final int COUNTDOWN_X;
 
+    private int score = 0;
     private int time_stamp = 0;
+    private float countdown;
+    private float cust_respawn_timer;
+    boolean active = true;
 
     // TODO temp test code
     Customer customer;
@@ -60,6 +74,8 @@ public class GameScreen implements Screen
         cam = new OrthographicCamera();
         cam.setToOrtho(false, LJGame.RES_X, LJGame.RES_Y);
 
+        gl = new GlyphLayout();
+
         // set up input
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
@@ -70,6 +86,7 @@ public class GameScreen implements Screen
         chocolate_texture = new Texture(Gdx.files.internal("Chocolate_Bar.png"));
         marshmallow_texture = new Texture(Gdx.files.internal("Marshmallow.png"));
         whip_texture = new Texture(Gdx.files.internal("Whipped_Cream.png"));
+        register_texture = new Texture(Gdx.files.internal("Cash_Register.png"));
 
         drink_textures = new Texture[] {
                 new Texture(Gdx.files.internal("Coffee.png")),
@@ -92,13 +109,46 @@ public class GameScreen implements Screen
                 new Texture(Gdx.files.internal("Bunny.png"))
         };
 
+        // load and prepare audio
+        bg_music = Gdx.audio.newMusic(Gdx.files.internal("bg_music.mp3"));
+        sale_sound = Gdx.audio.newSound(Gdx.files.internal("sale.mp3"));
+        fail_sound = Gdx.audio.newSound(Gdx.files.internal("fail.mp3"));
+
+        bg_music.setVolume(.1f);
+        bg_music.play();
+
         // EXAMPLE BUTTON
 //        button = new TextButton("Click Me!", skin);
 //        button.setSize(200, 50);
 //        button.setPosition(LJGame.RES_X / 2, LJGame.RES_Y / 2);
 //        stage.addActor(button);
 
-        setupToppingButton(chocolate_texture, 574, 0, new ClickListener()
+        setupImageButton(register_texture, 1350, 275, 300, 200, new ClickListener()
+        {
+            @Override
+            public void clicked(InputEvent event, float x, float y)
+            {
+                if(customer == null) return;
+
+                if(wip_drink.equals(customer.request))
+                {
+                    score++;
+                    countdown += 5;
+                    cust_respawn_timer = CUST_RESPAWN;
+                    customer = null;
+                    sale_sound.setVolume(sale_sound.play(), 0.1f);
+
+                    wip_drink = DrinkFactory.NamedDrink("Vanilla Latte");
+                }
+                else
+                {
+                    score = Math.max(0, score-1);
+                    fail_sound.setVolume(fail_sound.play(), 0.1f);
+                }
+            }
+        });
+
+        setupImageButton(chocolate_texture, 574, 0, 150, 150, new ClickListener()
         {
             @Override
             public void clicked(InputEvent event, float x, float y)
@@ -107,7 +157,7 @@ public class GameScreen implements Screen
             }
         });
 
-        setupToppingButton(whip_texture, 650, 90, new ClickListener()
+        setupImageButton(whip_texture, 650, 90, 150, 150, new ClickListener()
         {
             @Override
             public void clicked(InputEvent event, float x, float y)
@@ -115,7 +165,7 @@ public class GameScreen implements Screen
                 wip_drink = new Whip(wip_drink);
             }
         });
-        setupToppingButton(marshmallow_texture, 725, 0, new ClickListener()
+        setupImageButton(marshmallow_texture, 725, 0, 150, 150, new ClickListener()
         {
             @Override
             public void clicked(InputEvent event, float x, float y)
@@ -159,8 +209,11 @@ public class GameScreen implements Screen
         });
 
 //        wip_drink = new Marshmallow(new Whip(new Chocolate(DrinkFactory.RandomDrink())));
-        customer = new Customer(customer_textures[2], 5);
+//        customer = new Customer(customer_textures[2], 5);
         wip_drink = DrinkFactory.NamedDrink("Vanilla Late");
+
+        countdown = 20;
+        cust_respawn_timer = 1;
 
     }
 
@@ -176,13 +229,13 @@ public class GameScreen implements Screen
     }
 
     // also garbage :) but you should have seen it before
-    void setupToppingButton(Texture t, int x_pos, int y_pos, ClickListener cl)
+    void setupImageButton(Texture t, int x_pos, int y_pos, int width, int height, ClickListener cl)
     {
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
         TextureRegionDrawable trd = new TextureRegionDrawable(t);
 
         // magic numbers! wahooo! we love magic numbers!
-        trd.setMinSize(150, 150);
+        trd.setMinSize(width, height);
 
         style.imageUp = trd;
         style.imageDown = trd.tint(new Color(0.8f,0.8f,0.8f,1));
@@ -198,7 +251,7 @@ public class GameScreen implements Screen
     @Override
     public void show()
     {
-
+        bg_music.play();
     }
 
     @Override
@@ -215,20 +268,36 @@ public class GameScreen implements Screen
         // render here
         game.batch.draw(background, 0, 0, LJGame.RES_X, LJGame.RES_Y);
 
-        // draw customer
-        game.batch.draw(
-                customer.texture,
-                CUST_X - CUST_WIDTH / 2,
-                CUST_Y,
-                CUST_WIDTH,
-                CUST_HEIGHT);
+        if(customer != null)
+        {
+            // draw customer
+            game.batch.draw(
+                    customer.texture,
+                    CUST_X - CUST_WIDTH / 2,
+                    CUST_Y,
+                    CUST_WIDTH,
+                    CUST_HEIGHT);
+
+            // draw customer drink
+            drawDrink(customer.request, CUST_X, CUST_Y + 450 + (int) (Math.sin(time_stamp / 100.0) * 25));
+        }
 
         // draw WIP drink
         drawDrink(wip_drink, WIP_DRINK_X, WIP_DRINK_Y);
 
-        // draw customer drink TEMP
-        if(customer !=  null)
-            drawDrink(customer.request, CUST_X, CUST_Y + 450 + (int) (Math.sin(time_stamp / 100.0) * 25));
+        // draw countdown
+        gl.setText(game.font, String.format("%.1f", countdown));
+        game.font.draw(game.batch, String.format("%.1f", Math.max(0, countdown)), LJGame.RES_X / 2 - (gl.width / 2),LJGame.RES_Y);
+
+        // draw score
+        game.font.draw(game.batch, "Score: " + score, 0, LJGame.RES_Y);
+
+        // draw game over text if finished
+        if(!active)
+        {
+            gl.setText(game.font, "Game Over!");
+            game.font.draw(game.batch, "Game Over!", LJGame.RES_X / 2 - gl.width / 2, LJGame.RES_Y / 2 + gl.height / 2);
+        }
 
         game.batch.end();
 
@@ -324,24 +393,58 @@ public class GameScreen implements Screen
     @Override
     public void hide()
     {
-
+        bg_music.pause();
+        dispose();
     }
 
     @Override
     public void dispose()
     {
+        stage.dispose();
+        skin.dispose();
+        background.dispose();
+        chocolate_texture.dispose();
+        marshmallow_texture.dispose();
+        whip_texture.dispose();
+        register_texture.dispose();
 
+        for(Texture t : drink_textures)
+            t.dispose();
+        for(Texture t : milk_textures)
+            t.dispose();
+        for(Texture t : syrup_textures)
+            t.dispose();
+        for(Texture t : customer_textures)
+            t.dispose();
+
+        bg_music.dispose();
+        sale_sound.dispose();
+        fail_sound.dispose();
     }
 
     void update(float delta)
     {
+        if(countdown <= 0)
+            active = false;
+
+        if(!active && Gdx.input.isTouched())
+        {
+            game.setScreen(MainMenuScreen.getInstance(game));
+        }
+
         // screen behavior
         stage.act(delta);
 
-        customer.texture = customer_textures[(time_stamp / 50) % 3];
+//        customer.texture = customer_textures[(time_stamp / 50) % 3];
+
+        if(customer == null && cust_respawn_timer <= 0)
+        {
+            customer = new Customer(customer_textures[MathUtils.random(customer_textures.length-1)], (int) (5 * Math.log10(score + 1)));
+        }
+
+        countdown -= delta;
+        cust_respawn_timer -= delta;
 
         time_stamp++;
-
-        System.out.println(wip_drink.equals(customer.request) ? "Equals!" : "Not equals :(");
     }
 }
