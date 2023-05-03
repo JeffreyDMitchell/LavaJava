@@ -341,5 +341,7 @@ public class GameScreen implements Screen
         customer.texture = customer_textures[(time_stamp / 50) % 3];
 
         time_stamp++;
+
+        System.out.println(wip_drink.equals(customer.request) ? "Equals!" : "Not equals :(");
     }
 }
