@@ -3,6 +3,9 @@ package com.lavajava;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 
+// OO PATTERNS: FACTORY
+// Drink creation is handled via a factory. It vastly simplifies creation of random drinks for customer requests
+// the named drink creation is also a nice idea, even if we didn't make much use of it
 public class DrinkFactory
 {
 

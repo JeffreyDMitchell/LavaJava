@@ -30,6 +30,7 @@ public class MainMenuScreen implements Screen
     private int cat_texture_width, cat_texture_height;
 
     Array<Cat> cat_crowd;
+
     private MainMenuScreen(final LJGame game)
     {
         this.game = game;
@@ -60,8 +61,12 @@ public class MainMenuScreen implements Screen
         time_stamp = 0;
     }
 
+    // OOAD PATTERNS: SINGLETON
+    // MainMenuScreen is a singleton class. Only a single instance will ever be created
+    // As there is no need to modify the menu for individual accesses, it makes sense to avoid any teardown / recreation
     public static MainMenuScreen getInstance(LJGame game)
     {
+        // lazy instantiation
         if(instance == null)
             instance = new MainMenuScreen(game);
 
@@ -162,7 +167,7 @@ public class MainMenuScreen implements Screen
 
             if(time_stamp * ANIM_SPD > LJGame.RES_Y + 60)
             {
-//                time_stamp = 0;
+                time_stamp = LJGame.RES_Y / ANIM_SPD;
                 game.setScreen(new GameScreen(game));
             }
         }
@@ -170,7 +175,7 @@ public class MainMenuScreen implements Screen
         // sliding animation finished, start spawning cats into crowd
         // attempt to spawn a cat twice a second
         // only allow 50 cats
-        if(time_stamp * ANIM_SPD > LJGame.RES_Y && time_stamp % 120 == 0 && cat_crowd.size < 10)
+        if(time_stamp * ANIM_SPD > LJGame.RES_Y && time_stamp % 60 == 0 && cat_crowd.size < 10)
         {
             // 30% chance
             if(MathUtils.random() < .3)

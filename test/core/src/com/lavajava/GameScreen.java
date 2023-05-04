@@ -81,6 +81,11 @@ public class GameScreen implements Screen
         Gdx.input.setInputProcessor(stage);
         skin = new Skin(Gdx.files.internal("skin/plain-james-ui.json"));
 
+        // OO PATTERNS: FLYWEIGHT
+        // while I'll admit that the following code could certainly stand to be cleaned up
+        // using a fixed pool of resources (textures, sounds, etc.) and passing references to these
+        // resources for characters / drinks to make use of is a huge resource saving.
+
         // load and prepare textures
         background = new Texture(Gdx.files.internal("Cafe_Background.png"));
         chocolate_texture = new Texture(Gdx.files.internal("Chocolate_Bar.png"));

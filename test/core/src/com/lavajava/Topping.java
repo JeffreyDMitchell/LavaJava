@@ -1,6 +1,8 @@
 package com.lavajava;
 import java.util.ArrayList;
 
+// OO PATTERNS: DECORATOR
+// Toppings are implemented using the decorator pattern... for better or for worse...
 public class Topping extends Drink
 {
     static ArrayList<Class<? extends Drink>> topping_list = new ArrayList<Class<? extends Drink>>(){{
