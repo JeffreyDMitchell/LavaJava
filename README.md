@@ -19,3 +19,7 @@ Java 8
 - The project should then load (this can take a bit of time)
 - In order to run the project, choose an emulator and click the green play button
 - You can now play the game!
+
+## Link to Demo Video
+- The video is too large to push to GitHub, so we uploaded it to Youtube. Below is the link to the video:
+https://youtu.be/I6F5xxk_xS8
